@@ -14,24 +14,28 @@ use Spryker\Zed\Event\Dependency\Plugin\EventBaseHandlerInterface;
 interface EventCollectionInterface extends ArrayAccess, IteratorAggregate
 {
     /**
+     * This is used for sync operation
+     *
      * @param string $eventName
      * @param \Spryker\Zed\Event\Dependency\Plugin\EventBaseHandlerInterface $eventHandler
      * @param int|null $priority
-     * @param string|null $queuePoolName
      *
      * @return $this
      */
-    public function addListener($eventName, EventBaseHandlerInterface $eventHandler, $priority = 0, $queuePoolName = null);
+    public function addListener($eventName, EventBaseHandlerInterface $eventHandler, $priority = 0);
 
     /**
+     * This is used for async operation
+     *
      * @param string $eventName
      * @param \Spryker\Zed\Event\Dependency\Plugin\EventBaseHandlerInterface $eventHandler
      * @param int|null $priority
      * @param string|null $queuePoolName
+     * @param string|null $eventQueueName
      *
      * @return $this
      */
-    public function addListenerQueued($eventName, EventBaseHandlerInterface $eventHandler, $priority = 0, $queuePoolName = null);
+    public function addListenerQueued($eventName, EventBaseHandlerInterface $eventHandler, $priority = 0, $queuePoolName = null, $eventQueueName = null);
 
     /**
      * @param string $eventName
