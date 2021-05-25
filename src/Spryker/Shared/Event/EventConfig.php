@@ -26,4 +26,12 @@ class EventConfig extends AbstractBundleConfig
      * @api
      */
     public const EVENT_ROUTING_KEY_ERROR = 'error';
+
+    /**
+     * Specification:
+     * - Name of the internal event bus that handles events immediately after their dispatching.
+     *
+     * @api
+     */
+    public const EVENT_BUS_INTERNAL = '@internal';
 }

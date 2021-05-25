@@ -42,41 +42,40 @@ class EventDispatcherTest extends Unit
      */
     public function testTriggerWhenSynchronousEventTriggeredShouldInvokeHandle(): void
     {
-        $eventCollection = $this->createEventCollection();
-
+        // Arrange
         $transferMock = $this->createTransferMock();
 
         /** @var \PHPUnit\Framework\MockObject\MockObject|\Spryker\Zed\Event\Dependency\Plugin\EventHandlerInterface $eventListenerMock */
         $eventListenerMock = $this->createEventListenerMock();
-        $eventListenerMock
-            ->expects($this->once())
+        $eventListenerMock->expects($this->once())
             ->method('handle')
             ->with($transferMock);
 
+        $eventCollection = $this->createEventCollection();
         $eventCollection->addListener(static::TEST_EVENT_NAME, $eventListenerMock);
 
         $eventDispatcher = $this->createEventDispatcher($eventCollection);
 
+        // Act
         $eventDispatcher->trigger(static::TEST_EVENT_NAME, $transferMock);
     }
 
     /**
      * @return void
      */
-    public function testTriggerWhenAsynchronousEventTriggeredShouldWriteToQueue(): void
+    public function testTriggerBulkWhenAsynchronousEventTriggeredShouldWriteToQueue(): void
     {
+        // Arrange
         $transferMocks = [];
         $transferMocks[] = $this->createTransferMock();
         $transferMocks[] = $this->createTransferMock();
 
-        $eventCollection = $this->createEventCollection();
         /** @var \PHPUnit\Framework\MockObject\MockObject|\Spryker\Zed\Event\Dependency\Plugin\EventHandlerInterface $eventListenerMock */
         $eventListenerMock = $this->createEventListenerMock();
-
-        $eventListenerMock
-            ->expects($this->never())
+        $eventListenerMock->expects($this->never())
             ->method('handle');
 
+        $eventCollection = $this->createEventCollection();
         $eventCollection->addListenerQueued(static::TEST_EVENT_NAME, $eventListenerMock);
 
         /** @var \PHPUnit\Framework\MockObject\MockObject|\Spryker\Zed\Event\Business\Queue\Producer\EventQueueProducerInterface $queueProducerMock */
@@ -86,23 +85,24 @@ class EventDispatcherTest extends Unit
 
         $eventDispatcher = $this->createEventDispatcher($eventCollection, $queueProducerMock);
 
+        // Act
         $eventDispatcher->triggerBulk(static::TEST_EVENT_NAME, $transferMocks);
     }
 
     /**
      * @return void
      */
-    public function testTriggerBulkWhenAsynchronousEventTriggeredShouldWriteToQueue(): void
+    public function testTriggerWhenAsynchronousEventTriggeredShouldWriteToQueue(): void
     {
-        $eventCollection = $this->createEventCollection();
+        // Arrange
         $transferMock = $this->createTransferMock();
+
         /** @var \PHPUnit\Framework\MockObject\MockObject|\Spryker\Zed\Event\Dependency\Plugin\EventHandlerInterface $eventListenerMock */
         $eventListenerMock = $this->createEventListenerMock();
-
-        $eventListenerMock
-            ->expects($this->never())
+        $eventListenerMock->expects($this->never())
             ->method('handle');
 
+        $eventCollection = $this->createEventCollection();
         $eventCollection->addListenerQueued(static::TEST_EVENT_NAME, $eventListenerMock);
 
         /** @var \PHPUnit\Framework\MockObject\MockObject|\Spryker\Zed\Event\Business\Queue\Producer\EventQueueProducerInterface $queueProducerMock */
@@ -112,6 +112,7 @@ class EventDispatcherTest extends Unit
 
         $eventDispatcher = $this->createEventDispatcher($eventCollection, $queueProducerMock);
 
+        // Act
         $eventDispatcher->trigger(static::TEST_EVENT_NAME, $transferMock);
     }
 
@@ -120,7 +121,7 @@ class EventDispatcherTest extends Unit
      */
     public function testTriggerWhenEventHandledShouldLogIt(): void
     {
-        $eventCollection = $this->createEventCollection();
+        // Arrange
         $transferMock = $this->createTransferMock();
 
         /** @var \PHPUnit\Framework\MockObject\MockObject|\Spryker\Zed\Event\Business\Logger\EventLoggerInterface $eventLoggerMock */
@@ -130,114 +131,97 @@ class EventDispatcherTest extends Unit
 
         /** @var \PHPUnit\Framework\MockObject\MockObject|\Spryker\Zed\Event\Dependency\Plugin\EventHandlerInterface $eventListenerMock */
         $eventListenerMock = $this->createEventListenerMock();
-        $eventListenerMock
-            ->expects($this->once())
+        $eventListenerMock->expects($this->once())
             ->method('handle')
             ->with($transferMock);
 
+        $eventCollection = $this->createEventCollection();
         $eventCollection->addListener(static::TEST_EVENT_NAME, $eventListenerMock);
 
         $eventDispatcher = $this->createEventDispatcher($eventCollection, null, $eventLoggerMock);
 
+        // Act
         $eventDispatcher->trigger(static::TEST_EVENT_NAME, $transferMock);
     }
 
     /**
      * @return void
      */
-    public function testDispatchWhenSynchronousEventTriggeredShouldInvokeHandle(): void
+    public function testDispatchWhenSynchronousEventTriggeredShouldInvokeHandleWithInternalEventBrokerPlugin(): void
     {
-        $eventCollection = $this->createEventCollection();
-        $eventTransfer = new EventTransfer();
-        $eventTransfer->setEventName(static::TEST_EVENT_NAME)
-            ->setMessage($this->createTransferMock());
-
-        $eventTransfers = new ArrayObject();
-        $eventTransfers->append($eventTransfer);
-
-        $eventCollectionTransfer = new EventCollectionTransfer();
-        $eventCollectionTransfer->setEvents($eventTransfers);
+        // Arrange
+        $eventCollectionTransfer = $this->createEventCollectionTransfer();
 
         /** @var \PHPUnit\Framework\MockObject\MockObject|\Spryker\Zed\Event\Dependency\Plugin\EventHandlerInterface $eventListenerMock */
         $eventListenerMock = $this->createEventListenerMock();
         $eventListenerMock
             ->expects($this->once())
             ->method('handle')
-            ->with($eventTransfer->getMessage());
+            ->with($eventCollectionTransfer->getEvents()[0]->getMessage());
 
+        $eventCollection = $this->createEventCollection();
         $eventCollection->addListener(static::TEST_EVENT_NAME, $eventListenerMock);
 
         $eventDispatcher = $this->createEventDispatcher($eventCollection);
 
+        // Act
         $eventDispatcher->dispatch($eventCollectionTransfer);
     }
 
     /**
      * @return void
      */
-    public function testDispatchWhenAsynchronousEventTriggeredShouldWriteToQueue(): void
+    public function testDispatchWhenAsynchronousEventTriggeredShouldWriteToQueueWithInternalEventBrokerPlugin(): void
     {
-        $eventTransfer = new EventTransfer();
-        $eventTransfer->setEventName(static::TEST_EVENT_NAME)
-            ->setMessage($this->createTransferMock());
+        // Arrange
+        $eventCollectionTransfer = $this->createEventCollectionTransfer();
 
-        $eventTransfers = new ArrayObject();
-        $eventTransfers->append($eventTransfer);
-
-        $eventCollectionTransfer = new EventCollectionTransfer();
-        $eventCollectionTransfer->setEvents($eventTransfers);
         /** @var \PHPUnit\Framework\MockObject\MockObject|\Spryker\Zed\Event\Dependency\Plugin\EventHandlerInterface $eventListenerMock */
         $eventListenerMock = $this->createEventListenerMock();
-        $eventCollection = $this->createEventCollection();
-
-        //failed
         $eventListenerMock->expects($this->never())
             ->method('handle');
 
+        $eventCollection = $this->createEventCollection();
         $eventCollection->addListenerQueued(static::TEST_EVENT_NAME, $eventListenerMock);
 
         /** @var \PHPUnit\Framework\MockObject\MockObject|\Spryker\Zed\Event\Business\Queue\Producer\EventQueueProducerInterface $queueProducerMock */
         $queueProducerMock = $this->createQueueProducerMock();
         $queueProducerMock->expects($this->once())
-            ->method('enqueueListener');
+            ->method('enqueueListener')
+            ->with(static::TEST_EVENT_NAME, $eventCollectionTransfer->getEvents()[0]->getMessage());
 
         $eventDispatcher = $this->createEventDispatcher($eventCollection, $queueProducerMock);
 
+        // Act
         $eventDispatcher->dispatch($eventCollectionTransfer);
     }
 
     /**
      * @return void
      */
-    public function testDispatchWhenEventHandledShouldLogIt(): void
+    public function testDispatchWhenEventHandledShouldLogItWithInternalEventBrokerPlugin(): void
     {
-        $eventTransfer = new EventTransfer();
-        $eventTransfer->setEventName(static::TEST_EVENT_NAME)
-            ->setMessage($this->createTransferMock());
-
-        $eventTransfers = new ArrayObject();
-        $eventTransfers->append($eventTransfer);
-
-        $eventCollectionTransfer = new EventCollectionTransfer();
-        $eventCollectionTransfer->setEvents($eventTransfers);
+        // Arrange
+        $eventCollectionTransfer = $this->createEventCollectionTransfer();
 
         /** @var \PHPUnit\Framework\MockObject\MockObject|\Spryker\Zed\Event\Business\Logger\EventLoggerInterface $eventLoggerMock */
         $eventLoggerMock = $this->createEventLoggerMock();
         $eventLoggerMock->expects($this->once())
             ->method('log');
 
-        $eventCollection = $this->createEventCollection();
         /** @var \PHPUnit\Framework\MockObject\MockObject|\Spryker\Zed\Event\Dependency\Plugin\EventHandlerInterface $eventListenerMock */
         $eventListenerMock = $this->createEventListenerMock();
         $eventListenerMock
             ->expects($this->once())
             ->method('handle')
-            ->with($eventTransfer->getMessage());
+            ->with($eventCollectionTransfer->getEvents()[0]->getMessage());
 
+        $eventCollection = $this->createEventCollection();
         $eventCollection->addListener(static::TEST_EVENT_NAME, $eventListenerMock);
 
         $eventDispatcher = $this->createEventDispatcher($eventCollection, null, $eventLoggerMock);
 
+        // Act
         $eventDispatcher->dispatch($eventCollectionTransfer);
     }
 

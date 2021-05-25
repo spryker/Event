@@ -13,7 +13,6 @@ interface EventRouterInterface
      * Specification:
      * - Maps `$eventName` and `$transfers` into EventCollectionTransfer and puts events in all wired Event Broker plugins.
      * - Event Broker plugins are filtered by `$eventBusName`.
-     * - If there is no one Event Broker plugin after filtering it throws EventBrokerPluginNotFoundException.
      *
      * @api
      *
@@ -21,9 +20,7 @@ interface EventRouterInterface
      * @param \Spryker\Shared\Kernel\Transfer\TransferInterface[] $transfers
      * @param string $eventBusName
      *
-     * @throws \Spryker\Zed\Event\Business\Exception\EventBrokerPluginNotFoundException
-     *
      * @return void
      */
-    public function route(string $eventName, array $transfers, string $eventBusName): void;
+    public function putEvents(string $eventName, array $transfers, string $eventBusName): void;
 }

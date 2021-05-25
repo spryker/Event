@@ -19,6 +19,7 @@ class InternalEventBrokerPlugin extends AbstractPlugin implements EventBrokerPlu
 {
     /**
      * {@inheritDoc}
+     * - Transits events to the Internal Event Broker (immediately handles events).
      *
      * @api
      *
@@ -33,6 +34,7 @@ class InternalEventBrokerPlugin extends AbstractPlugin implements EventBrokerPlu
 
     /**
      * {@inheritDoc}
+     * - Returns true if requested `eventBusName` is registered in configs.
      *
      * @api
      *
@@ -40,7 +42,7 @@ class InternalEventBrokerPlugin extends AbstractPlugin implements EventBrokerPlu
      *
      * @return bool
      */
-    public function isSupportEventBusName(string $eventBusName): bool
+    public function isApplicable(string $eventBusName): bool
     {
         return in_array($eventBusName, $this->getConfig()->getInternalEventBusNames());
     }

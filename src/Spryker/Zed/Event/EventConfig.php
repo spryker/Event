@@ -9,6 +9,7 @@ namespace Spryker\Zed\Event;
 
 use Spryker\Client\Kernel\ClassResolver\Config\BundleConfigNotFoundException;
 use Spryker\Client\Kernel\ClassResolver\Config\BundleConfigResolver;
+use Spryker\Shared\Event\EventConfig as SharedEventConfig;
 use Spryker\Shared\Event\EventConstants;
 use Spryker\Zed\Kernel\AbstractBundleConfig;
 
@@ -113,7 +114,7 @@ class EventConfig extends AbstractBundleConfig
     public function getInternalEventBusNames(): array
     {
         return [
-            EventConstants::EVENT_BUS_INTERNAL,
+            SharedEventConfig::EVENT_BUS_INTERNAL,
         ];
     }
 

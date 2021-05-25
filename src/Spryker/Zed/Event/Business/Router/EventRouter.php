@@ -10,7 +10,6 @@ namespace Spryker\Zed\Event\Business\Router;
 use ArrayObject;
 use Generated\Shared\Transfer\EventCollectionTransfer;
 use Generated\Shared\Transfer\EventTransfer;
-use Ramsey\Uuid\Uuid;
 use Spryker\Zed\Event\Business\Exception\EventBrokerPluginNotFoundException;
 
 class EventRouter implements EventRouterInterface
@@ -22,9 +21,15 @@ class EventRouter implements EventRouterInterface
 
     /**
      * @param \Spryker\Shared\EventExtension\Dependency\Plugin\EventBrokerPluginInterface[] $eventBrokerPlugins
+     *
+     * @throws \Spryker\Zed\Event\Business\Exception\EventBrokerPluginNotFoundException
      */
     public function __construct(array $eventBrokerPlugins)
     {
+        if (!$eventBrokerPlugins) {
+            throw new EventBrokerPluginNotFoundException();
+        }
+
         $this->eventBrokerPlugins = $eventBrokerPlugins;
     }
 
@@ -37,25 +42,16 @@ class EventRouter implements EventRouterInterface
      * @param \Spryker\Shared\Kernel\Transfer\TransferInterface[] $transfers
      * @param string $eventBusName
      *
-     * @throws \Spryker\Zed\Event\Business\Exception\EventBrokerPluginNotFoundException
-     *
      * @return void
      */
-    public function route(string $eventName, array $transfers, string $eventBusName): void
+    public function putEvents(string $eventName, array $transfers, string $eventBusName): void
     {
         $eventCollectionTransfer = $this->prepareEventCollectionTransfer($eventBusName, $transfers);
-        $isHerePlugin = false;
 
         foreach ($this->eventBrokerPlugins as $eventBrokerPlugin) {
-            if ($eventBrokerPlugin->isSupportEventBusName($eventBusName)) {
-                $isHerePlugin = true;
-
+            if ($eventBrokerPlugin->isApplicable($eventBusName)) {
                 $eventBrokerPlugin->putEvents($eventCollectionTransfer);
             }
-        }
-
-        if (!$isHerePlugin) {
-            throw new EventBrokerPluginNotFoundException();
         }
     }
 
@@ -75,7 +71,7 @@ class EventRouter implements EventRouterInterface
                 ->setMessage($transfer)
                 ->setMessageType(get_class($transfer))
                 ->setTimestamp(microtime(true))
-                ->setEventUuid(Uuid::uuid4()->toString());
+                ->setEventUuid(uniqid('event-', true));
 
             $eventTransfers->append($eventTransfer);
         }

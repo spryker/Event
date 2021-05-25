@@ -8,7 +8,7 @@
 namespace Spryker\Zed\Event\Business;
 
 use Generated\Shared\Transfer\EventCollectionTransfer;
-use Spryker\Shared\Event\EventConstants;
+use Spryker\Shared\Event\EventConfig;
 use Spryker\Shared\Kernel\Transfer\TransferInterface;
 use Spryker\Zed\Kernel\Business\AbstractFacade;
 
@@ -26,15 +26,13 @@ class EventFacade extends AbstractFacade implements EventFacadeInterface
      * @param \Spryker\Shared\Kernel\Transfer\TransferInterface $transfer
      * @param string $eventBusName
      *
-     * @throws \Spryker\Zed\Event\Business\Exception\EventBrokerPluginNotFoundException
-     *
      * @return void
      */
-    public function trigger($eventName, TransferInterface $transfer, string $eventBusName = EventConstants::EVENT_BUS_INTERNAL)
+    public function trigger($eventName, TransferInterface $transfer, string $eventBusName = EventConfig::EVENT_BUS_INTERNAL)
     {
         $this->getFactory()
             ->createEventRouter()
-            ->route($eventName, [$transfer], $eventBusName);
+            ->putEvents($eventName, [$transfer], $eventBusName);
     }
 
     /**
@@ -46,15 +44,13 @@ class EventFacade extends AbstractFacade implements EventFacadeInterface
      * @param \Generated\Shared\Transfer\EventEntityTransfer[] $transfers
      * @param string $eventBusName
      *
-     * @throws \Spryker\Zed\Event\Business\Exception\EventBrokerPluginNotFoundException
-     *
      * @return void
      */
-    public function triggerBulk($eventName, array $transfers, string $eventBusName = EventConstants::EVENT_BUS_INTERNAL): void
+    public function triggerBulk($eventName, array $transfers, string $eventBusName = EventConfig::EVENT_BUS_INTERNAL): void
     {
         $this->getFactory()
             ->createEventRouter()
-            ->route($eventName, $transfers, $eventBusName);
+            ->putEvents($eventName, $transfers, $eventBusName);
     }
 
     /**
