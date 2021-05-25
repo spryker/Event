@@ -84,4 +84,12 @@ interface EventConstants
      * @api
      */
     public const IS_INSTANCE_POOLING_ALLOWED = 'EVENT:IS_INSTANCE_POOLING_ALLOWED';
+
+    /**
+     * Specification:
+     * - Name of the internal event bus that handles events immediately after their dispatching.
+     *
+     * @api
+     */
+    public const EVENT_BUS_INTERNAL = '@internal';
 }

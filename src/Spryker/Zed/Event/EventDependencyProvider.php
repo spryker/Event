@@ -7,6 +7,7 @@
 
 namespace Spryker\Zed\Event;
 
+use Spryker\Zed\Event\Communication\Plugin\InternalEventBrokerPlugin;
 use Spryker\Zed\Event\Dependency\Client\EventToQueueBridge;
 use Spryker\Zed\Event\Dependency\EventCollection;
 use Spryker\Zed\Event\Dependency\EventSubscriberCollection;
@@ -21,6 +22,7 @@ class EventDependencyProvider extends AbstractBundleDependencyProvider
 {
     public const EVENT_LISTENERS = 'event_listeners';
     public const EVENT_SUBSCRIBERS = 'event subscribers';
+    public const EVENT_BROKER_PLUGINS = 'EVENT_BROKER_PLUGINS';
 
     public const CLIENT_QUEUE = 'client queue';
 
@@ -37,11 +39,14 @@ class EventDependencyProvider extends AbstractBundleDependencyProvider
         $container = $this->addEventSubscriberCollection($container);
         $container = $this->addQueueClient($container);
         $container = $this->addUtilEncodingService($container);
+        $container = $this->addEventBrokerPlugins($container);
 
         return $container;
     }
 
     /**
+     * @phpstan-return \Spryker\Zed\Event\Dependency\EventCollectionInterface<string, \Spryker\Zed\Event\Business\Dispatcher\EventListenerContextInterface[]>
+     *
      * @return \Spryker\Zed\Event\Dependency\EventCollectionInterface
      */
     public function getEventListenerCollection()
@@ -50,6 +55,8 @@ class EventDependencyProvider extends AbstractBundleDependencyProvider
     }
 
     /**
+     * @phpstan-return \Spryker\Zed\Event\Dependency\EventSubscriberCollectionInterface<\Spryker\Zed\Event\Dependency\Plugin\EventSubscriberInterface>
+     *
      * @return \Spryker\Zed\Event\Dependency\EventSubscriberCollectionInterface
      */
     public function getEventSubscriberCollection()
@@ -111,5 +118,29 @@ class EventDependencyProvider extends AbstractBundleDependencyProvider
         });
 
         return $container;
+    }
+
+    /**
+     * @param \Spryker\Zed\Kernel\Container $container
+     *
+     * @return \Spryker\Zed\Kernel\Container
+     */
+    protected function addEventBrokerPlugins(Container $container): Container
+    {
+        $container->set(static::EVENT_BROKER_PLUGINS, function () {
+            return $this->getEventBrokerPlugins();
+        });
+
+        return $container;
+    }
+
+    /**
+     * @return \Spryker\Shared\EventExtension\Dependency\Plugin\EventBrokerPluginInterface[]
+     */
+    public function getEventBrokerPlugins()
+    {
+        return [
+            new InternalEventBrokerPlugin(),
+        ];
     }
 }

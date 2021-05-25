@@ -7,6 +7,7 @@
 
 namespace Spryker\Zed\Event\Business\Dispatcher;
 
+use Generated\Shared\Transfer\EventCollectionTransfer;
 use Spryker\Shared\Kernel\Transfer\TransferInterface;
 
 interface EventDispatcherInterface
@@ -38,4 +39,11 @@ interface EventDispatcherInterface
      * @return void
      */
     public function triggerByListenerName(string $listenerName, string $eventName, array $transfers): void;
+
+    /**
+     * @param \Generated\Shared\Transfer\EventCollectionTransfer $eventCollectionTransfer
+     *
+     * @return void
+     */
+    public function dispatch(EventCollectionTransfer $eventCollectionTransfer): void;
 }

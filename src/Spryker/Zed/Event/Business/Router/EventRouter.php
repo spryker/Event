@@ -1,0 +1,88 @@
+<?php
+
+/**
+ * Copyright © 2016-present Spryker Systems GmbH. All rights reserved.
+ * Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
+ */
+
+namespace Spryker\Zed\Event\Business\Router;
+
+use ArrayObject;
+use Generated\Shared\Transfer\EventCollectionTransfer;
+use Generated\Shared\Transfer\EventTransfer;
+use Ramsey\Uuid\Uuid;
+use Spryker\Zed\Event\Business\Exception\EventBrokerPluginNotFoundException;
+
+class EventRouter implements EventRouterInterface
+{
+    /**
+     * @var \Spryker\Shared\EventExtension\Dependency\Plugin\EventBrokerPluginInterface[]
+     */
+    private $eventBrokerPlugins;
+
+    /**
+     * @param \Spryker\Shared\EventExtension\Dependency\Plugin\EventBrokerPluginInterface[] $eventBrokerPlugins
+     */
+    public function __construct(array $eventBrokerPlugins)
+    {
+        $this->eventBrokerPlugins = $eventBrokerPlugins;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @api
+     *
+     * @param string $eventName
+     * @param \Spryker\Shared\Kernel\Transfer\TransferInterface[] $transfers
+     * @param string $eventBusName
+     *
+     * @throws \Spryker\Zed\Event\Business\Exception\EventBrokerPluginNotFoundException
+     *
+     * @return void
+     */
+    public function route(string $eventName, array $transfers, string $eventBusName): void
+    {
+        $eventCollectionTransfer = $this->prepareEventCollectionTransfer($eventBusName, $transfers);
+        $isHerePlugin = false;
+
+        foreach ($this->eventBrokerPlugins as $eventBrokerPlugin) {
+            if ($eventBrokerPlugin->isSupportEventBusName($eventBusName)) {
+                $isHerePlugin = true;
+
+                $eventBrokerPlugin->putEvents($eventCollectionTransfer);
+            }
+        }
+
+        if (!$isHerePlugin) {
+            throw new EventBrokerPluginNotFoundException();
+        }
+    }
+
+    /**
+     * @param string $eventName
+     * @param \Spryker\Shared\Kernel\Transfer\TransferInterface[] $transfers
+     *
+     * @return \Generated\Shared\Transfer\EventCollectionTransfer
+     */
+    protected function prepareEventCollectionTransfer(string $eventName, array $transfers): EventCollectionTransfer
+    {
+        $eventTransfers = new ArrayObject();
+
+        foreach ($transfers as $transfer) {
+            $eventTransfer = new EventTransfer();
+            $eventTransfer->setEventName($eventName)
+                ->setMessage($transfer)
+                ->setMessageType(get_class($transfer))
+                ->setTimestamp(microtime(true))
+                ->setEventUuid(Uuid::uuid4()->toString());
+
+            $eventTransfers->append($eventTransfer);
+        }
+
+        $eventCollectionTransfer = new EventCollectionTransfer();
+        $eventCollectionTransfer->setEvents($eventTransfers);
+
+        return $eventCollectionTransfer;
+    }
+}

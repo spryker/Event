@@ -7,6 +7,8 @@
 
 namespace Spryker\Zed\Event\Business\Dispatcher;
 
+use Generated\Shared\Transfer\EventCollectionTransfer;
+use Generated\Shared\Transfer\EventTransfer;
 use Spryker\Shared\Kernel\Transfer\TransferInterface;
 use Spryker\Zed\Event\Business\EventFacadeInterface;
 use Spryker\Zed\Event\Business\Exception\EventListenerAmbiguousException;
@@ -22,6 +24,8 @@ use Spryker\Zed\Event\Dependency\Service\EventToUtilEncodingInterface;
 class EventDispatcher implements EventDispatcherInterface
 {
     /**
+     * @phpstan-var \Spryker\Zed\Event\Dependency\EventCollectionInterface<string, \Spryker\Zed\Event\Business\Dispatcher\EventListenerContextInterface[]>
+     *
      * @var \Spryker\Zed\Event\Dependency\EventCollectionInterface
      */
     protected $eventCollection;
@@ -42,7 +46,7 @@ class EventDispatcher implements EventDispatcherInterface
     protected $utilEncodingService;
 
     /**
-     * @param \Spryker\Zed\Event\Dependency\EventCollectionInterface $eventCollection
+     * @param \Spryker\Zed\Event\Dependency\EventCollectionInterface<string, \Spryker\Zed\Event\Business\Dispatcher\EventListenerContextInterface[]> $eventCollection
      * @param \Spryker\Zed\Event\Business\Queue\Producer\EventQueueProducerInterface $eventQueueProducer
      * @param \Spryker\Zed\Event\Business\Logger\EventLoggerInterface $eventLogger
      * @param \Spryker\Zed\Event\Dependency\Service\EventToUtilEncodingInterface $utilEncodingService
@@ -60,6 +64,8 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
+     * @deprecated Use {@link \Spryker\Zed\Event\Business\Dispatcher\EventDispatcher::dispatch()} instead.
+     *
      * @param string $eventName
      * @param \Spryker\Shared\Kernel\Transfer\TransferInterface $transfer
      *
@@ -90,6 +96,8 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
+     * @deprecated Use {@link \Spryker\Zed\Event\Business\Dispatcher\EventDispatcher::dispatch()} instead.
+     *
      * @param string $eventName
      * @param \Generated\Shared\Transfer\EventEntityTransfer[] $transfers
      *
@@ -117,6 +125,50 @@ class EventDispatcher implements EventDispatcherInterface
             }
 
             $this->logEventHandleBulk($eventName, $transfers, $eventListener);
+        }
+    }
+
+    /**
+     * @param \Generated\Shared\Transfer\EventCollectionTransfer $eventCollectionTransfer
+     *
+     * @return void
+     */
+    public function dispatch(EventCollectionTransfer $eventCollectionTransfer): void
+    {
+        foreach ($eventCollectionTransfer->getEvents() as $eventTransfer) {
+            $this->dispatchEvent($eventTransfer);
+        }
+    }
+
+    /**
+     * @param \Generated\Shared\Transfer\EventTransfer $eventTransfer
+     *
+     * @return void
+     */
+    protected function dispatchEvent(EventTransfer $eventTransfer): void
+    {
+        $eventName = $eventTransfer->getEventName();
+        /** @var \Spryker\Shared\Kernel\Transfer\TransferInterface $messageEventTransfer */
+        $messageEventTransfer = $eventTransfer->getMessage();
+        $eventListeners = $this->extractEventListeners($eventName);
+
+        if (empty($eventListeners)) {
+            return;
+        }
+
+        foreach (clone $eventListeners as $eventListener) {
+            if ($eventListener->isHandledInQueue()) {
+                $this->eventQueueProducer->enqueueListener(
+                    $eventName,
+                    $messageEventTransfer,
+                    $eventListener->getListenerName(),
+                    $eventListener->getQueuePoolName(),
+                    $eventListener->getEventQueueName()
+                );
+            } else {
+                $this->eventProducer($eventName, $messageEventTransfer, $eventListener);
+            }
+            $this->logEventHandle($eventName, $messageEventTransfer, $eventListener);
         }
     }
 
@@ -288,7 +340,7 @@ class EventDispatcher implements EventDispatcherInterface
     /**
      * @param string $eventName
      *
-     * @return \Spryker\Zed\Event\Business\Dispatcher\EventListenerContextInterface[]|\SplPriorityQueue
+     * @return \SplPriorityQueue|array
      */
     protected function extractEventListeners($eventName)
     {
@@ -318,7 +370,7 @@ class EventDispatcher implements EventDispatcherInterface
 
     /**
      * @param string $eventName
-     * @param \Generated\Shared\Transfer\EventEntityTransfer[] $transfer
+     * @param \Spryker\Shared\Kernel\Transfer\TransferInterface $transfer
      * @param \Spryker\Zed\Event\Business\Dispatcher\EventListenerContextInterface $eventListener
      *
      * @return void

@@ -13,6 +13,8 @@ use Spryker\Zed\Event\Business\Logger\LoggerConfig;
 use Spryker\Zed\Event\Business\Queue\Consumer\EventQueueConsumer;
 use Spryker\Zed\Event\Business\Queue\Forwarder\MessageForwarder;
 use Spryker\Zed\Event\Business\Queue\Producer\EventQueueProducer;
+use Spryker\Zed\Event\Business\Router\EventRouter;
+use Spryker\Zed\Event\Business\Router\EventRouterInterface;
 use Spryker\Zed\Event\Business\Subscriber\SubscriberMerger;
 use Spryker\Zed\Event\EventDependencyProvider;
 use Spryker\Zed\Kernel\Business\AbstractBusinessFactory;
@@ -67,6 +69,22 @@ class EventBusinessFactory extends AbstractBusinessFactory
     }
 
     /**
+     * @return \Spryker\Zed\Event\Business\Router\EventRouterInterface
+     */
+    public function createEventRouter(): EventRouterInterface
+    {
+        return new EventRouter($this->getEventBrokerPlugins());
+    }
+
+    /**
+     * @return \Spryker\Shared\EventExtension\Dependency\Plugin\EventBrokerPluginInterface[]
+     */
+    public function getEventBrokerPlugins()
+    {
+        return $this->getProvidedDependency(EventDependencyProvider::EVENT_BROKER_PLUGINS);
+    }
+
+    /**
      * @return \Spryker\Zed\Event\Business\Subscriber\SubscriberMergerInterface
      */
     protected function createSubscriberMerger()
@@ -83,6 +101,8 @@ class EventBusinessFactory extends AbstractBusinessFactory
     }
 
     /**
+     * @phpstan-return \Spryker\Zed\Event\Dependency\EventCollectionInterface<string, \Spryker\Zed\Event\Business\Dispatcher\EventListenerContextInterface[]>
+     *
      * @return \Spryker\Zed\Event\Dependency\EventCollectionInterface
      */
     protected function getEventListeners()
@@ -91,6 +111,8 @@ class EventBusinessFactory extends AbstractBusinessFactory
     }
 
     /**
+     * @phpstan-return \Spryker\Zed\Event\Dependency\EventSubscriberCollectionInterface<\Spryker\Zed\Event\Dependency\Plugin\EventSubscriberInterface>
+     *
      * @return \Spryker\Zed\Event\Dependency\EventSubscriberCollectionInterface
      */
     protected function getEventSubscriberCollection()

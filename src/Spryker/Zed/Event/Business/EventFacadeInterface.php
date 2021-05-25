@@ -7,6 +7,8 @@
 
 namespace Spryker\Zed\Event\Business;
 
+use Generated\Shared\Transfer\EventCollectionTransfer;
+use Spryker\Shared\Event\EventConstants;
 use Spryker\Shared\Kernel\Transfer\TransferInterface;
 
 /**
@@ -16,33 +18,51 @@ interface EventFacadeInterface
 {
     /**
      * Specification:
-     * - Handles all events by registered by give $eventName
-     * - Passes transfer object to each listener
-     * - If listener is queueable then it will put into queue system.
+     * - Puts the event into appropriate Event Brokers based on given event bus name.
+     * - If event bus name is empty calls `EventFacade::dispatch` by default via InternalEventBrokerPlugin if wired.
      *
      * @api
      *
      * @param string $eventName
      * @param \Spryker\Shared\Kernel\Transfer\TransferInterface $transfer
+     * @param string $eventBusName
+     *
+     * @throws \Spryker\Zed\Event\Business\Exception\EventBrokerPluginNotFoundException
      *
      * @return void
      */
-    public function trigger($eventName, TransferInterface $transfer);
+    public function trigger($eventName, TransferInterface $transfer, string $eventBusName = EventConstants::EVENT_BUS_INTERNAL);
 
     /**
      * Specification:
-     * - Handles all events by registered by give $eventName
-     * - Passes array of transfer object to each listener
-     * - If listener is queueable then it will put into queue system.
+     * - Puts the events into appropriate Event Brokers.
+     * - Calls `EventFacade::dispatchBulk` by default via InternalEventBrokerPlugin if wired.
      *
      * @api
      *
      * @param string $eventName
      * @param \Generated\Shared\Transfer\EventEntityTransfer[] $transfers
+     * @param string $eventBusName
+     *
+     * @throws \Spryker\Zed\Event\Business\Exception\EventBrokerPluginNotFoundException
      *
      * @return void
      */
-    public function triggerBulk($eventName, array $transfers): void;
+    public function triggerBulk($eventName, array $transfers, string $eventBusName = EventConstants::EVENT_BUS_INTERNAL): void;
+
+    /**
+     * Specification:
+     * - Handles all events by registered by appropriate $eventName in each EventTransfer.
+     * - Passes transfer object to each listener
+     * - If listener is queueable then it will put into queue system.
+     *
+     * @api
+     *
+     * @param \Generated\Shared\Transfer\EventCollectionTransfer $eventCollectionTransfer
+     *
+     * @return void
+     */
+    public function dispatch(EventCollectionTransfer $eventCollectionTransfer): void;
 
     /**
      * Specification:

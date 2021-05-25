@@ -104,6 +104,20 @@ class EventConfig extends AbstractBundleConfig
     }
 
     /**
+     * Keeps list of available event buses' names that can be used as internal brokers.
+     *
+     * @api
+     *
+     * @return string[]
+     */
+    public function getInternalEventBusNames(): array
+    {
+        return [
+            EventConstants::EVENT_BUS_INTERNAL,
+        ];
+    }
+
+    /**
      * @deprecated This is added only for BC reason and will
      * be removed in the next major.
      *
