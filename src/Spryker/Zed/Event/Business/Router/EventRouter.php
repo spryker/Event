@@ -66,7 +66,7 @@ class EventRouter implements EventRouterInterface
         $eventTransfers = new ArrayObject();
 
         foreach ($transfers as $transfer) {
-            $timestamp = (int)(microtime(true) * 1000);
+            $timestamp = (string)(microtime(true));
 
             $eventTransfer = new EventTransfer();
             $eventTransfer->setEventName($eventName)
