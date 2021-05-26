@@ -64,71 +64,6 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * @deprecated Use {@link \Spryker\Zed\Event\Business\Dispatcher\EventDispatcher::dispatch()} instead.
-     *
-     * @param string $eventName
-     * @param \Spryker\Shared\Kernel\Transfer\TransferInterface $transfer
-     *
-     * @return void
-     */
-    public function trigger(string $eventName, TransferInterface $transfer): void
-    {
-        $eventListeners = $this->extractEventListeners($eventName);
-
-        if (empty($eventListeners)) {
-            return;
-        }
-
-        foreach (clone $eventListeners as $eventListener) {
-            if ($eventListener->isHandledInQueue()) {
-                $this->eventQueueProducer->enqueueListener(
-                    $eventName,
-                    $transfer,
-                    $eventListener->getListenerName(),
-                    $eventListener->getQueuePoolName(),
-                    $eventListener->getEventQueueName()
-                );
-            } else {
-                $this->eventProducer($eventName, $transfer, $eventListener);
-            }
-            $this->logEventHandle($eventName, $transfer, $eventListener);
-        }
-    }
-
-    /**
-     * @deprecated Use {@link \Spryker\Zed\Event\Business\Dispatcher\EventDispatcher::dispatch()} instead.
-     *
-     * @param string $eventName
-     * @param \Generated\Shared\Transfer\EventEntityTransfer[] $transfers
-     *
-     * @return void
-     */
-    public function triggerBulk(string $eventName, array $transfers): void
-    {
-        $eventListeners = $this->extractEventListeners($eventName);
-
-        if (empty($eventListeners)) {
-            return;
-        }
-
-        foreach (clone $eventListeners as $eventListener) {
-            if ($eventListener->isHandledInQueue()) {
-                $this->eventQueueProducer->enqueueListenerBulk(
-                    $eventName,
-                    $transfers,
-                    $eventListener->getListenerName(),
-                    $eventListener->getQueuePoolName(),
-                    $eventListener->getEventQueueName()
-                );
-            } else {
-                $this->eventBulkProducer($eventName, $transfers, $eventListener);
-            }
-
-            $this->logEventHandleBulk($eventName, $transfers, $eventListener);
-        }
-    }
-
-    /**
      * @param \Generated\Shared\Transfer\EventCollectionTransfer $eventCollectionTransfer
      *
      * @return void
@@ -340,7 +275,7 @@ class EventDispatcher implements EventDispatcherInterface
     /**
      * @param string $eventName
      *
-     * @return \SplPriorityQueue|array
+     * @return \SplPriorityQueue|mixed[]
      */
     protected function extractEventListeners($eventName)
     {

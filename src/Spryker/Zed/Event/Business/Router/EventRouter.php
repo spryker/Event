@@ -66,11 +66,13 @@ class EventRouter implements EventRouterInterface
         $eventTransfers = new ArrayObject();
 
         foreach ($transfers as $transfer) {
+            $timestamp = (int)(microtime(true) * 1000);
+
             $eventTransfer = new EventTransfer();
             $eventTransfer->setEventName($eventName)
                 ->setMessage($transfer)
                 ->setMessageType(get_class($transfer))
-                ->setTimestamp(microtime(true))
+                ->setTimestamp($timestamp)
                 ->setEventUuid(uniqid('event-', true));
 
             $eventTransfers->append($eventTransfer);

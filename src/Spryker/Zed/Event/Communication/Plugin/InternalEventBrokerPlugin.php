@@ -44,6 +44,6 @@ class InternalEventBrokerPlugin extends AbstractPlugin implements EventBrokerPlu
      */
     public function isApplicable(string $eventBusName): bool
     {
-        return in_array($eventBusName, $this->getConfig()->getInternalEventBusNames());
+        return in_array($eventBusName, $this->getConfig()->getInternalEventBusNames(), true);
     }
 }
