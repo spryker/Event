@@ -17,7 +17,7 @@ class EventRouter implements EventRouterInterface
     /**
      * @var \Spryker\Shared\EventExtension\Dependency\Plugin\EventBrokerPluginInterface[]
      */
-    private $eventBrokerPlugins;
+    protected $eventBrokerPlugins;
 
     /**
      * @param \Spryker\Shared\EventExtension\Dependency\Plugin\EventBrokerPluginInterface[] $eventBrokerPlugins

@@ -46,7 +46,9 @@ class EventDispatcher implements EventDispatcherInterface
     protected $utilEncodingService;
 
     /**
-     * @param \Spryker\Zed\Event\Dependency\EventCollectionInterface<string, \Spryker\Zed\Event\Business\Dispatcher\EventListenerContextInterface[]> $eventCollection
+     * @phpstan-param \Spryker\Zed\Event\Dependency\EventCollectionInterface<string, \Spryker\Zed\Event\Business\Dispatcher\EventListenerContextInterface[]> $eventCollection
+     *
+     * @param \Spryker\Zed\Event\Dependency\EventCollectionInterface $eventCollection
      * @param \Spryker\Zed\Event\Business\Queue\Producer\EventQueueProducerInterface $eventQueueProducer
      * @param \Spryker\Zed\Event\Business\Logger\EventLoggerInterface $eventLogger
      * @param \Spryker\Zed\Event\Dependency\Service\EventToUtilEncodingInterface $utilEncodingService

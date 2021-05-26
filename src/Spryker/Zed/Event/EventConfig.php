@@ -9,7 +9,6 @@ namespace Spryker\Zed\Event;
 
 use Spryker\Client\Kernel\ClassResolver\Config\BundleConfigNotFoundException;
 use Spryker\Client\Kernel\ClassResolver\Config\BundleConfigResolver;
-use Spryker\Shared\Event\EventConfig as SharedEventConfig;
 use Spryker\Shared\Event\EventConstants;
 use Spryker\Zed\Kernel\AbstractBundleConfig;
 
@@ -20,6 +19,12 @@ class EventConfig extends AbstractBundleConfig
 
     public const DEFAULT_MAX_RETRY = 1;
     public const NO_RETRY = 0;
+
+    /**
+     * Specification:
+     * - Name of the internal event bus that handles events immediately after their dispatching.
+     */
+    public const EVENT_BUS_INTERNAL = '@internal';
 
     /**
      * @api
@@ -105,7 +110,7 @@ class EventConfig extends AbstractBundleConfig
     }
 
     /**
-     * Keeps list of available event buses' names that can be used as internal brokers.
+     * Keeps list of available event bus names that are applicable for internal broker.
      *
      * @api
      *
@@ -114,7 +119,7 @@ class EventConfig extends AbstractBundleConfig
     public function getInternalEventBusNames(): array
     {
         return [
-            SharedEventConfig::EVENT_BUS_INTERNAL,
+            static::EVENT_BUS_INTERNAL,
         ];
     }
 

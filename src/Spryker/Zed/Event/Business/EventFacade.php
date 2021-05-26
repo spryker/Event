@@ -8,8 +8,8 @@
 namespace Spryker\Zed\Event\Business;
 
 use Generated\Shared\Transfer\EventCollectionTransfer;
-use Spryker\Shared\Event\EventConfig;
 use Spryker\Shared\Kernel\Transfer\TransferInterface;
+use Spryker\Zed\Event\EventConfig;
 use Spryker\Zed\Kernel\Business\AbstractFacade;
 
 /**
