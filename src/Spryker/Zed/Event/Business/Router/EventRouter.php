@@ -46,7 +46,7 @@ class EventRouter implements EventRouterInterface
      */
     public function putEvents(string $eventName, array $transfers, string $eventBusName): void
     {
-        $eventCollectionTransfer = $this->prepareEventCollectionTransfer($eventBusName, $transfers);
+        $eventCollectionTransfer = $this->prepareEventCollectionTransfer($eventBusName, $transfers, $eventBusName);
 
         foreach ($this->eventBrokerPlugins as $eventBrokerPlugin) {
             if ($eventBrokerPlugin->isApplicable($eventBusName)) {
@@ -58,11 +58,15 @@ class EventRouter implements EventRouterInterface
     /**
      * @param string $eventName
      * @param \Spryker\Shared\Kernel\Transfer\TransferInterface[] $transfers
+     * @param string $eventBusName
      *
      * @return \Generated\Shared\Transfer\EventCollectionTransfer
      */
-    protected function prepareEventCollectionTransfer(string $eventName, array $transfers): EventCollectionTransfer
-    {
+    protected function prepareEventCollectionTransfer(
+        string $eventName,
+        array $transfers,
+        string $eventBusName
+    ): EventCollectionTransfer {
         $eventTransfers = new ArrayObject();
 
         foreach ($transfers as $transfer) {
@@ -80,6 +84,7 @@ class EventRouter implements EventRouterInterface
 
         $eventCollectionTransfer = new EventCollectionTransfer();
         $eventCollectionTransfer->setEvents($eventTransfers);
+        $eventCollectionTransfer->setEventBusName($eventBusName);
 
         return $eventCollectionTransfer;
     }
