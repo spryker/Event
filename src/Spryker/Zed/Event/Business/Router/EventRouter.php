@@ -46,7 +46,7 @@ class EventRouter implements EventRouterInterface
      */
     public function putEvents(string $eventName, array $transfers, string $eventBusName): void
     {
-        $eventCollectionTransfer = $this->prepareEventCollectionTransfer($eventBusName, $transfers, $eventBusName);
+        $eventCollectionTransfer = $this->prepareEventCollectionTransfer($eventName, $transfers, $eventBusName);
 
         foreach ($this->eventBrokerPlugins as $eventBrokerPlugin) {
             if ($eventBrokerPlugin->isApplicable($eventBusName)) {

@@ -27,6 +27,18 @@ class EventConfig extends AbstractBundleConfig
     public const EVENT_BUS_INTERNAL = '@internal';
 
     /**
+     * Specification:
+     * - Name of the test event bus.
+     */
+    public const EVENT_BUS_TEST_ONE = 'eventBusOne';
+
+    /**
+     * Specification:
+     * - Name of the test event bus.
+     */
+    public const EVENT_BUS_TEST_TWO = 'eventBusTwo';
+
+    /**
      * @api
      *
      * @return string|null
