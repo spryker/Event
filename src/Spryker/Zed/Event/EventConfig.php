@@ -28,15 +28,15 @@ class EventConfig extends AbstractBundleConfig
 
     /**
      * Specification:
-     * - Name of the test event bus.
+     * - Name of the event bus for PBC.
      */
-    public const EVENT_BUS_TEST_ONE = 'eventBusOne';
+    public const EVENT_BUS_PBC = 'pbc';
 
     /**
      * Specification:
-     * - Name of the test event bus.
+     * - Name of the event bus for payment.
      */
-    public const EVENT_BUS_TEST_TWO = 'eventBusTwo';
+    public const EVENT_BUS_PAYMENT = 'payment';
 
     /**
      * @api

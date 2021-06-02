@@ -290,23 +290,6 @@ class EventDispatcher implements EventDispatcherInterface
 
     /**
      * @param string $eventName
-     * @param \Generated\Shared\Transfer\EventEntityTransfer[] $transfers
-     * @param \Spryker\Zed\Event\Business\Dispatcher\EventListenerContextInterface $eventListener
-     *
-     * @return void
-     */
-    protected function logEventHandleBulk(
-        string $eventName,
-        array $transfers,
-        EventListenerContextInterface $eventListener
-    ): void {
-        foreach ($transfers as $transfer) {
-            $this->logEventHandle($eventName, $transfer, $eventListener);
-        }
-    }
-
-    /**
-     * @param string $eventName
      * @param \Spryker\Shared\Kernel\Transfer\TransferInterface $transfer
      * @param \Spryker\Zed\Event\Business\Dispatcher\EventListenerContextInterface $eventListener
      *
