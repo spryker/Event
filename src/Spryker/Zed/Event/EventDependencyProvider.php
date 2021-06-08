@@ -137,7 +137,7 @@ class EventDependencyProvider extends AbstractBundleDependencyProvider
     /**
      * @return \Spryker\Shared\EventExtension\Dependency\Plugin\EventBrokerPluginInterface[]
      */
-    protected function getEventBrokerPlugins()
+    protected function getEventBrokerPlugins(): array
     {
         return [
             new InternalEventBrokerPlugin(),
