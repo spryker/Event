@@ -25,4 +25,17 @@
         <property name="body" type="string"/>
     </transfer>
 
+    <transfer name="Event">
+        <property name="eventName" type="string"/>
+        <property name="eventUuid" type="string"/>
+        <property name="timestamp" type="string"/>
+        <property name="message" type="object"/>
+        <property name="messageType" type="string"/>
+    </transfer>
+
+    <transfer name="EventCollection">
+        <property name="events" type="Event[]" singular="event"/>
+        <property name="eventBusName" type="string"/>
+    </transfer>
+
 </transfers>
