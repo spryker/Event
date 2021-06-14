@@ -55,8 +55,6 @@ class EventDependencyProvider extends AbstractBundleDependencyProvider
     }
 
     /**
-     * @phpstan-return \Spryker\Zed\Event\Dependency\EventSubscriberCollectionInterface<\Spryker\Zed\Event\Dependency\Plugin\EventSubscriberInterface>
-     *
      * @return \Spryker\Zed\Event\Dependency\EventSubscriberCollectionInterface
      */
     public function getEventSubscriberCollection()

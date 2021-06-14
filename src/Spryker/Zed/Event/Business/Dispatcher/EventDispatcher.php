@@ -275,13 +275,13 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * @param string $eventName
+     * @param string|null $eventName
      *
-     * @return \SplPriorityQueue|mixed[]
+     * @return \SplPriorityQueue|\Spryker\Zed\Event\Business\Dispatcher\EventListenerContextInterface[]
      */
-    protected function extractEventListeners($eventName)
+    protected function extractEventListeners(?string $eventName)
     {
-        if (!$this->eventCollection->has($eventName)) {
+        if ($eventName === null || !$this->eventCollection->has($eventName)) {
             return [];
         }
 
