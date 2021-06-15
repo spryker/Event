@@ -14,12 +14,14 @@ use Generated\Shared\Transfer\EventQueueSendMessageBodyTransfer;
 use Generated\Shared\Transfer\EventTransfer;
 use Generated\Shared\Transfer\QueueReceiveMessageTransfer;
 use Generated\Shared\Transfer\QueueSendMessageTransfer;
+use ReflectionProperty;
 use Spryker\Shared\EventExtension\Dependency\Plugin\EventBrokerPluginInterface;
 use Spryker\Shared\Kernel\Transfer\TransferInterface;
 use Spryker\Zed\Event\Business\EventBusinessFactory;
 use Spryker\Zed\Event\Business\EventFacade;
 use Spryker\Zed\Event\Business\Router\EventRouter;
 use Spryker\Zed\Event\Business\Router\EventRouterInterface;
+use Spryker\Zed\Event\Business\Subscriber\SubscriberMerger;
 use Spryker\Zed\Event\Dependency\EventCollection;
 use Spryker\Zed\Event\Dependency\EventCollectionInterface;
 use Spryker\Zed\Event\Dependency\EventSubscriberCollection;
@@ -58,6 +60,10 @@ class EventFacadeTest extends Unit
     public function testDispatchWhenEventProvidedWithSubscriberShouldHandleListener(): void
     {
         // Arrange
+        $reflection = new ReflectionProperty(SubscriberMerger::class, 'eventCollectionBuffer');
+        $reflection->setAccessible(true);
+        $reflection->setValue(null, null);
+
         $eventFacade = $this->createEventFacade();
         $eventCollectionTransfer = $this->createEventCollectionTransfer();
 
