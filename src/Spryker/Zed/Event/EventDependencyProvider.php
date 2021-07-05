@@ -7,7 +7,6 @@
 
 namespace Spryker\Zed\Event;
 
-use Spryker\Zed\Event\Communication\Plugin\InternalEventBrokerPlugin;
 use Spryker\Zed\Event\Dependency\Client\EventToQueueBridge;
 use Spryker\Zed\Event\Dependency\EventCollection;
 use Spryker\Zed\Event\Dependency\EventSubscriberCollection;
@@ -137,8 +136,6 @@ class EventDependencyProvider extends AbstractBundleDependencyProvider
      */
     protected function getEventBrokerPlugins(): array
     {
-        return [
-            new InternalEventBrokerPlugin(),
-        ];
+        return [];
     }
 }

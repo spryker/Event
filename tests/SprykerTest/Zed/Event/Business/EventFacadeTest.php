@@ -17,6 +17,7 @@ use Generated\Shared\Transfer\QueueSendMessageTransfer;
 use ReflectionProperty;
 use Spryker\Shared\EventExtension\Dependency\Plugin\EventBrokerPluginInterface;
 use Spryker\Shared\Kernel\Transfer\TransferInterface;
+use Spryker\Zed\Event\Business\Dispatcher\EventDispatcherInterface;
 use Spryker\Zed\Event\Business\EventBusinessFactory;
 use Spryker\Zed\Event\Business\EventFacade;
 use Spryker\Zed\Event\Business\Router\EventRouter;
@@ -109,7 +110,12 @@ class EventFacadeTest extends Unit
         $eventBrokerPluginMock->method('isApplicable')
             ->willReturn(true);
 
-        $eventRouter = new EventRouter([$eventBrokerPluginMock]);
+        /** @var \PHPUnit\Framework\MockObject\MockObject|\Spryker\Zed\Event\Business\Dispatcher\EventDispatcherInterface $eventDispatcherMock */
+        $eventDispatcherMock = $this->createEventDispatcherMock();
+        $eventDispatcherMock->expects($this->once())
+            ->method('dispatch');
+
+        $eventRouter = new EventRouter($eventDispatcherMock, [$eventBrokerPluginMock]);
 
         $eventBusinessFactory = $this->createEventBusinessFactoryMock($eventRouter);
 
@@ -118,6 +124,39 @@ class EventFacadeTest extends Unit
 
         // Act
         $eventFacade->trigger(static::TEST_EVENT_NAME, $objectTransferMock);
+    }
+
+    /**
+     * @return void
+     */
+    public function testTriggerShouldPutEventsIntoEventBrokerPluginButNotInInternal(): void
+    {
+        // Arrange
+        $objectTransferMock = $this->createTransferObjectMock();
+        $testClass = $this;
+        /** @var \PHPUnit\Framework\MockObject\MockObject|\Spryker\Shared\EventExtension\Dependency\Plugin\EventBrokerPluginInterface $eventBrokerPluginMock */
+        $eventBrokerPluginMock = $this->createEventBrokerPluginMock();
+        $eventBrokerPluginMock->method('putEvents')
+            ->willReturnCallback(function (EventCollectionTransfer $eventCollectionTransfer) use ($testClass, $objectTransferMock): void {
+                $testClass->assertSame($objectTransferMock, $eventCollectionTransfer->getEvents()[0]->getMessage());
+            });
+        $eventBrokerPluginMock->method('isApplicable')
+            ->willReturn(true);
+
+        /** @var \PHPUnit\Framework\MockObject\MockObject|\Spryker\Zed\Event\Business\Dispatcher\EventDispatcherInterface $eventDispatcherMock */
+        $eventDispatcherMock = $this->createEventDispatcherMock();
+        $eventDispatcherMock->expects($this->any())
+            ->method('dispatch');
+
+        $eventRouter = new EventRouter($eventDispatcherMock, [$eventBrokerPluginMock]);
+
+        $eventBusinessFactory = $this->createEventBusinessFactoryMock($eventRouter);
+
+        $eventFacade = $this->createEventFacade();
+        $eventFacade->setFactory($eventBusinessFactory);
+
+        // Act
+        $eventFacade->trigger(static::TEST_EVENT_NAME, $objectTransferMock, 'eventBusName');
     }
 
     /**
@@ -133,7 +172,12 @@ class EventFacadeTest extends Unit
         $eventBrokerPluginMock->method('isApplicable')
             ->willReturn(false);
 
-        $eventRouter = new EventRouter([$eventBrokerPluginMock]);
+        /** @var \PHPUnit\Framework\MockObject\MockObject|\Spryker\Zed\Event\Business\Dispatcher\EventDispatcherInterface $eventDispatcherMock */
+        $eventDispatcherMock = $this->createEventDispatcherMock();
+        $eventDispatcherMock->expects($this->once())
+            ->method('dispatch');
+
+        $eventRouter = new EventRouter($eventDispatcherMock, [$eventBrokerPluginMock]);
 
         $eventBusinessFactory = $this->createEventBusinessFactoryMock($eventRouter);
 
@@ -178,7 +222,12 @@ class EventFacadeTest extends Unit
             $eventBrokerPluginMockApplicable,
         ];
 
-        $eventRouter = new EventRouter($eventBrokerPluginMocks);
+        /** @var \PHPUnit\Framework\MockObject\MockObject|\Spryker\Zed\Event\Business\Dispatcher\EventDispatcherInterface $eventDispatcherMock */
+        $eventDispatcherMock = $this->createEventDispatcherMock();
+        $eventDispatcherMock->expects($this->exactly(1))
+            ->method('dispatch');
+
+        $eventRouter = new EventRouter($eventDispatcherMock, $eventBrokerPluginMocks);
 
         $eventBusinessFactory = $this->createEventBusinessFactoryMock($eventRouter);
 
@@ -349,6 +398,15 @@ class EventFacadeTest extends Unit
     protected function createEventBrokerPluginMock(): EventBrokerPluginInterface
     {
         return $this->getMockBuilder(EventBrokerPluginInterface::class)
+            ->getMock();
+    }
+
+    /**
+     * @return \PHPUnit\Framework\MockObject\MockObject|\Spryker\Zed\Event\Business\Dispatcher\EventDispatcherInterface
+     */
+    protected function createEventDispatcherMock(): EventDispatcherInterface
+    {
+        return $this->getMockBuilder(EventDispatcherInterface::class)
             ->getMock();
     }
 

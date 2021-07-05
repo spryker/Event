@@ -30,7 +30,6 @@
         <property name="eventUuid" type="string"/>
         <property name="timestamp" type="string"/>
         <property name="message" type="object"/>
-        <property name="messageType" type="string"/>
     </transfer>
 
     <transfer name="EventCollection">

@@ -73,7 +73,10 @@ class EventBusinessFactory extends AbstractBusinessFactory
      */
     public function createEventRouter(): EventRouterInterface
     {
-        return new EventRouter($this->getEventBrokerPlugins());
+        return new EventRouter(
+            $this->createEventDispatcher(),
+            $this->getEventBrokerPlugins()
+        );
     }
 
     /**

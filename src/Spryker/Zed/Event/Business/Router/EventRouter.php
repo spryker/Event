@@ -10,7 +10,8 @@ namespace Spryker\Zed\Event\Business\Router;
 use ArrayObject;
 use Generated\Shared\Transfer\EventCollectionTransfer;
 use Generated\Shared\Transfer\EventTransfer;
-use Spryker\Zed\Event\Business\Exception\EventBrokerPluginNotFoundException;
+use Spryker\Zed\Event\Business\Dispatcher\EventDispatcherInterface;
+use Spryker\Zed\Event\EventConfig;
 
 class EventRouter implements EventRouterInterface
 {
@@ -20,16 +21,19 @@ class EventRouter implements EventRouterInterface
     protected $eventBrokerPlugins;
 
     /**
-     * @param \Spryker\Shared\EventExtension\Dependency\Plugin\EventBrokerPluginInterface[] $eventBrokerPlugins
-     *
-     * @throws \Spryker\Zed\Event\Business\Exception\EventBrokerPluginNotFoundException
+     * @var \Spryker\Zed\Event\Business\Dispatcher\EventDispatcherInterface
      */
-    public function __construct(array $eventBrokerPlugins)
-    {
-        if (!$eventBrokerPlugins) {
-            throw new EventBrokerPluginNotFoundException();
-        }
+    protected $eventDispatcher;
 
+    /**
+     * @param \Spryker\Zed\Event\Business\Dispatcher\EventDispatcherInterface $eventDispatcher
+     * @param \Spryker\Shared\EventExtension\Dependency\Plugin\EventBrokerPluginInterface[] $eventBrokerPlugins
+     */
+    public function __construct(
+        EventDispatcherInterface $eventDispatcher,
+        array $eventBrokerPlugins
+    ) {
+        $this->eventDispatcher = $eventDispatcher;
         $this->eventBrokerPlugins = $eventBrokerPlugins;
     }
 
@@ -53,6 +57,10 @@ class EventRouter implements EventRouterInterface
                 $eventBrokerPlugin->putEvents($eventCollectionTransfer);
             }
         }
+
+        if ($eventBusName === EventConfig::EVENT_BUS_INTERNAL) {
+            $this->eventDispatcher->dispatch($eventCollectionTransfer);
+        }
     }
 
     /**
@@ -75,7 +83,6 @@ class EventRouter implements EventRouterInterface
             $eventTransfer = new EventTransfer();
             $eventTransfer->setEventName($eventName)
                 ->setMessage($transfer)
-                ->setMessageType(get_class($transfer))
                 ->setTimestamp($timestamp)
                 ->setEventUuid(uniqid('event-', true));
 

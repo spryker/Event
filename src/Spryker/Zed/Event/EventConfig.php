@@ -27,18 +27,6 @@ class EventConfig extends AbstractBundleConfig
     public const EVENT_BUS_INTERNAL = '@internal';
 
     /**
-     * Specification:
-     * - Name of the event bus for PBC.
-     */
-    public const EVENT_BUS_PBC = 'pbc';
-
-    /**
-     * Specification:
-     * - Name of the event bus for payment.
-     */
-    public const EVENT_BUS_PAYMENT = 'payment';
-
-    /**
      * @api
      *
      * @return string|null

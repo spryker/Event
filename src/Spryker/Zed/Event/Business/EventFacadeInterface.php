@@ -19,7 +19,7 @@ interface EventFacadeInterface
     /**
      * Specification:
      * - Puts the event into appropriate Event Brokers based on given event bus name.
-     * - If event bus name is empty calls `EventFacade::dispatch` by default via InternalEventBrokerPlugin if wired.
+     * - If event bus name is empty executes internal event dispatching.
      *
      * @api
      *

@@ -24,8 +24,6 @@ use Spryker\Zed\Event\Dependency\Service\EventToUtilEncodingInterface;
 class EventDispatcher implements EventDispatcherInterface
 {
     /**
-     * @phpstan-var \Spryker\Zed\Event\Dependency\EventCollectionInterface<string, \Spryker\Zed\Event\Business\Dispatcher\EventListenerContextInterface[]>
-     *
      * @var \Spryker\Zed\Event\Dependency\EventCollectionInterface
      */
     protected $eventCollection;
@@ -46,8 +44,6 @@ class EventDispatcher implements EventDispatcherInterface
     protected $utilEncodingService;
 
     /**
-     * @phpstan-param \Spryker\Zed\Event\Dependency\EventCollectionInterface<string, \Spryker\Zed\Event\Business\Dispatcher\EventListenerContextInterface[]> $eventCollection
-     *
      * @param \Spryker\Zed\Event\Dependency\EventCollectionInterface $eventCollection
      * @param \Spryker\Zed\Event\Business\Queue\Producer\EventQueueProducerInterface $eventQueueProducer
      * @param \Spryker\Zed\Event\Business\Logger\EventLoggerInterface $eventLogger
@@ -277,7 +273,7 @@ class EventDispatcher implements EventDispatcherInterface
     /**
      * @param string|null $eventName
      *
-     * @return \SplPriorityQueue|\Spryker\Zed\Event\Business\Dispatcher\EventListenerContextInterface[]
+     * @return \Spryker\Zed\Event\Business\Dispatcher\EventListenerContextInterface[]|\SplPriorityQueue
      */
     protected function extractEventListeners(?string $eventName)
     {
