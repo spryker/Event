@@ -26,14 +26,22 @@ class EventRouter implements EventRouterInterface
     protected $eventDispatcher;
 
     /**
+     * @var \Spryker\Zed\Event\EventConfig
+     */
+    protected $eventConfig;
+
+    /**
      * @param \Spryker\Zed\Event\Business\Dispatcher\EventDispatcherInterface $eventDispatcher
+     * @param \Spryker\Zed\Event\EventConfig $eventConfig
      * @param \Spryker\Shared\EventExtension\Dependency\Plugin\EventBrokerPluginInterface[] $eventBrokerPlugins
      */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
+        EventConfig $eventConfig,
         array $eventBrokerPlugins
     ) {
         $this->eventDispatcher = $eventDispatcher;
+        $this->eventConfig = $eventConfig;
         $this->eventBrokerPlugins = $eventBrokerPlugins;
     }
 
@@ -58,7 +66,7 @@ class EventRouter implements EventRouterInterface
             }
         }
 
-        if ($eventBusName === EventConfig::EVENT_BUS_INTERNAL) {
+        if (in_array($eventBusName, $this->eventConfig->getInternalEventBusNames())) {
             $this->eventDispatcher->dispatch($eventCollectionTransfer);
         }
     }
